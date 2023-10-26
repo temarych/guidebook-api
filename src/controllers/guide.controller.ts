@@ -1,10 +1,10 @@
 import { type Request, type Response } from 'express';
-import createHttpError                 from 'http-errors';
 import { Prisma }                      from '@prisma/client';
 import { ZodError, z }                 from 'zod';
 import { fromZodError }                from 'zod-validation-error';
-import { prisma }                      from '../index';
+import { HttpError }                   from '../models/error';
 import { authorize }                   from '../services/authorize';
+import { prisma }                      from '../index';
 
 const createGuideSchema = z.object({
   title      : z.string(),
@@ -26,7 +26,11 @@ export const createGuide = async (request: Request, response: Response) => {
   } catch (error) {
     if (error instanceof ZodError) {
       const validationError = fromZodError(error);
-      throw new createHttpError.BadRequest(validationError.message);
+      throw new HttpError({
+        status : 400,
+        code   : 'guide/validation',
+        message: validationError.message
+      });
     }
     throw error;
   }
@@ -43,7 +47,11 @@ export const getGuide = async (request: Request, response: Response) => {
     response.send(guide);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new createHttpError.BadRequest('Invalid id');
+      throw new HttpError({
+        status : 400,
+        code   : 'guide/invalid-id',
+        message: 'Invalid id'
+      });
     }
     throw error;
   }
