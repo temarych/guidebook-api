@@ -1,5 +1,14 @@
 import { type Request, type Response } from 'express';
+import { prisma }                      from '../index';
 
-export const searchGuides = (request: Request, response: Response): void => {
-  response.send('Search guides');
+export const searchGuides = async (request: Request, response: Response) => {
+  const query = request.query.query as string;
+
+  const guides = await prisma.guide.findMany({
+    where: {
+      title: { contains: query }
+    }
+  });
+
+  response.send(guides);
 };

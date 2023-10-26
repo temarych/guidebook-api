@@ -9,9 +9,12 @@
         "sourceType": "module"
     },
     "rules": {
-        "semi": ["warn", "always"],
-        "@typescript-eslint/semi": ["warn", "always"],
-        "@typescript-eslint/quotes": ["warn", "single", { "allowTemplateLiterals": true }],
-        "no-multi-spaces": "off"
+        "semi"                                            : ["warn", "always"],
+        "@typescript-eslint/semi"                         : ["warn", "always"],
+        "@typescript-eslint/quotes"                       : ["warn", "single", { "allowTemplateLiterals": true }],
+        "@typescript-eslint/no-misused-promises"          : "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-confusing-void-expression" : "off",
+        "no-multi-spaces"                                 : "off"
     }
 }
