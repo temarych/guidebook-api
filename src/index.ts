@@ -1,6 +1,7 @@
 import 'express-async-errors';
 
 import express          from 'express';
+import cors             from 'cors';
 import dotenv           from 'dotenv';
 import bodyParser       from 'body-parser';
 import { PrismaClient } from '@prisma/client';
@@ -14,6 +15,7 @@ export const port   = process.env.PORT as string;
 export const app    = express();
 export const prisma = new PrismaClient();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/search', searchRoute);
 app.use('/guide', guideRoute);
