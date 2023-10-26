@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import { z }                           from 'zod';
-import { authorize }                   from '../services/authorize';
+import { authorize }                   from '../services/auth.service';
 import { prisma }                      from '../index';
 
 const createGuideSchema = z.object({

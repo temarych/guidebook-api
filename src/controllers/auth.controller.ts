@@ -1,8 +1,8 @@
 import { type Request, type Response } from 'express';
 import bcrypt                          from 'bcrypt';
 import { z }                           from 'zod';
-import { createAccessToken }           from '../services/token';
-import { authorize }                   from '../services/authorize';
+import { createAccessToken }           from '../services/token.service';
+import { authorize }                   from '../services/auth.service';
 import { Profile }                     from '../models/profile';
 import { HttpError }                   from '../models/error';
 import { prisma }                      from '../index';

@@ -1,7 +1,7 @@
 import { type Request }      from 'express';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { HttpError }         from '../models/error';
-import { verifyToken }       from './token';
+import { verifyToken }       from './token.service';
 import { prisma }            from '../index';
 
 export const authorize = async (request: Request) => {
