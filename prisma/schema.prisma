@@ -8,6 +8,9 @@ datasource db {
 }
 
 model Guide {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  emoji       String
+  title       String
+  description String
+  image       String
 }
