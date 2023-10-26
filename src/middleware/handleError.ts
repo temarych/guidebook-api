@@ -17,6 +17,10 @@ export const handleError = (
   response: Response,
   next    : NextFunction
 ) => {
+  if (error instanceof HttpError) {
+    throw error;
+  }
+
   if (error instanceof ZodError) {
     throw new HttpError({
       status : 400,
