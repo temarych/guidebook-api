@@ -5,13 +5,17 @@ import {
 }                    from 'express';
 import { HttpError } from '../models/error';
 
-export const errorHandler = (error: unknown, request: Request, response: Response, next: NextFunction) => {
+export const handleHttpError = (
+  error   : unknown,
+  request : Request,
+  response: Response,
+  next    : NextFunction
+) => {
   if (error instanceof HttpError) {
-    response.status(error.status).send({
+    return response.status(error.status).send({
       code : error.code,
       error: error.message
     });
-    return next();
   }
-  console.error(error);
+  throw error;
 };
