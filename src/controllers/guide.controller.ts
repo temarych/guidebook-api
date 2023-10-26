@@ -1,18 +1,11 @@
 import { type Request, type Response } from 'express';
-import { z }                           from 'zod';
-import { authorize }                   from '../services/auth.service';
+import { type User }                   from '@prisma/client';
+import { type ICreateGuideSchema }     from '../models/guide';
 import { prisma }                      from '../index';
 
-const createGuideSchema = z.object({
-  title      : z.string(),
-  emoji      : z.string().emoji(),
-  description: z.string(),
-  image      : z.string()
-});
-
 export const createGuide = async (request: Request, response: Response) => {
-  const user  = await authorize(request);
-  const data  = createGuideSchema.parse(request.body);
+  const user  = request.user as User;
+  const data  = request.body as ICreateGuideSchema;
 
   const guide = await prisma.guide.create({
     data: { ...data, authorId: user.id }

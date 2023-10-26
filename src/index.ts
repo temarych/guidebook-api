@@ -9,7 +9,6 @@ import { searchRoute }      from './routes/search.route';
 import { guideRoute }       from './routes/guide.route';
 import { authRoute }        from './routes/auth.route';
 import { handleError }      from './middleware/handleError';
-import { handleHttpError }  from './middleware/handleHttpError';
 
 dotenv.config();
 
@@ -25,7 +24,6 @@ app.use('/guide', guideRoute);
 app.use('/auth', authRoute);
 
 app.use(handleError);
-app.use(handleHttpError);
 
 app.listen(port, () => {
   console.log(`Express server is running at http://localhost:${port}`);

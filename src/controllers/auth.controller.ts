@@ -1,20 +1,20 @@
-import { type Request, type Response } from 'express';
-import bcrypt                          from 'bcrypt';
-import { z }                           from 'zod';
-import { createAccessToken }           from '../services/token.service';
-import { authorize }                   from '../services/auth.service';
-import { Profile }                     from '../models/profile';
-import { HttpError }                   from '../models/error';
-import { prisma }                      from '../index';
-
-const signUpSchema = z.object({
-  username: z.string(),
-  email   : z.string(),
-  password: z.string()
-});
+import {
+  type Request,
+  type Response
+}                            from 'express';
+import bcrypt                from 'bcrypt';
+import { type User }         from '@prisma/client';
+import { createAccessToken } from '../utils/token';
+import { Profile }           from '../models/profile';
+import { HttpError }         from '../models/error';
+import {
+  type ISignInSchema,
+  type ISignUpSchema
+}                            from '../models/auth';
+import { prisma }            from '../index';
 
 export const signUp = async (request: Request, response: Response) => {
-  const data = signUpSchema.parse(request.body);
+  const data = request.body as ISignUpSchema;
 
   const password = await bcrypt.hash(data.password, 10);
   const user     = await prisma.user.create({ data: { ...data, password } });
@@ -24,13 +24,8 @@ export const signUp = async (request: Request, response: Response) => {
   response.send({ accessToken });
 };
 
-const signInSchema = z.object({
-  email   : z.string(),
-  password: z.string()
-});
-
 export const signIn = async (request: Request, response: Response) => {
-  const data = signInSchema.parse(request.body);
+  const data = request.body as ISignInSchema;
 
   const user = await prisma.user.findFirst({
     where: { email: data.email }
@@ -60,7 +55,7 @@ export const signIn = async (request: Request, response: Response) => {
 };
 
 export const getMe = async (request: Request, response: Response) => {
-  const user    = await authorize(request);
+  const user    = request.user as User;
   const profile = new Profile(user);
 
   response.send({ ...profile });
