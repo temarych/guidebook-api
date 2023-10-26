@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { errorHandler } from './middleware/errorHandler';
 import { searchRoute }  from './routes/search.route';
 import { guideRoute }   from './routes/guide.route';
+import { authRoute }    from './routes/auth.route';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/search', searchRoute);
 app.use('/guide', guideRoute);
+app.use('/auth', authRoute);
 app.use(errorHandler);
 
 app.listen(port, () => {
