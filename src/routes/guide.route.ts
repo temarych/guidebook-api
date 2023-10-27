@@ -2,7 +2,7 @@ import { Router }                from 'express';
 import { createGuide, getGuide } from '../controllers/guide.controller';
 import { validate }              from '../middleware/validate';
 import { authorize }             from '../middleware/authorize';
-import { createGuideSchema }     from '../models/guide';
+import { createGuideSchema }     from '../schemas/guide.schema';
 
 export const guideRoute = Router();
 

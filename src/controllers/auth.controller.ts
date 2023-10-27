@@ -5,11 +5,10 @@ import {
 import bcrypt                from 'bcrypt';
 import { type User }         from '@prisma/client';
 import { createAccessToken } from '../utils/token';
-import { Profile }           from '../models/profile';
 import {
   type ISignInSchema,
   type ISignUpSchema
-}                            from '../models/auth';
+}                            from '../schemas/auth.schema';
 import { prisma }            from '../index';
 
 export const signUp = async (request: Request, response: Response) => {
@@ -73,8 +72,11 @@ export const signIn = async (request: Request, response: Response) => {
 };
 
 export const getMe = async (request: Request, response: Response) => {
-  const user    = request.user as User;
-  const profile = new Profile(user);
+  const user = request.user as User;
 
-  response.send({ ...profile });
+  response.send({
+    id      : user.id,
+    username: user.username,
+    email   : user.email
+  });
 };
