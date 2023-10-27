@@ -18,7 +18,14 @@ export const getGuide = async (request: Request, response: Response) => {
   const id = request.params.id;
 
   const guide = await prisma.guide.findFirst({
-    where: { id }
+    where  : { id },
+    include: {
+      author: {
+        select: {
+          username: true
+        }
+      }
+    }
   });
 
   response.send(guide);
