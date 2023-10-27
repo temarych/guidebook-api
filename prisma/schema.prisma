@@ -7,10 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  username String @unique
+  email    String @unique
+  password String
+  guides   Guide[]
+}
+
 model Guide {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   emoji       String
   title       String
   description String
   image       String
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    String @db.ObjectId
 }
