@@ -8,7 +8,6 @@ import {
   type Schema
 }                       from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import { HttpError }    from '../models/error';
 
 export const validate = <T>(schema: Schema<T>) => (
   request : Request,
@@ -20,8 +19,7 @@ export const validate = <T>(schema: Schema<T>) => (
     return next();
   } catch (error) {
     if (error instanceof ZodError) {
-      throw new HttpError({
-        status : 400,
+      return response.status(400).send({
         code   : 'invalid-request-body',
         message: fromZodError(error).message
       });

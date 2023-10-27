@@ -7,7 +7,6 @@ import {
   JsonWebTokenError,
   TokenExpiredError
 }                      from 'jsonwebtoken';
-import { HttpError }   from '../models/error';
 import { verifyToken } from '../utils/token';
 import { prisma }      from '../index';
 
@@ -20,8 +19,7 @@ export const authorize = async (
     const accessToken = request.headers.authorization;
 
     if (accessToken === undefined) {
-      throw new HttpError({
-        status : 401,
+      return response.status(401).send({
         code   : 'no-jwt',
         message: 'No access token provided'
       });
@@ -31,8 +29,7 @@ export const authorize = async (
     const user = await prisma.user.findFirst({ where: { id } });
 
     if (user === null) {
-      throw new HttpError({
-        status : 404,
+      return response.status(404).send({
         code   : 'user-not-found',
         message: 'No user found'
       });
@@ -43,16 +40,14 @@ export const authorize = async (
     return next();
   } catch (error) {
     if (error instanceof TokenExpiredError) {
-      throw new HttpError({
-        status : 401,
+      return response.status(401).send({
         code   : 'jwt-expired',
         message: 'Access token is expired'
       });
     }
 
     if (error instanceof JsonWebTokenError) {
-      throw new HttpError({
-        status : 401,
+      return response.status(401).send({
         code   : 'jwt-invalid',
         message: 'Access token is not valid'
       });
