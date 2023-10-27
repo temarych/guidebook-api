@@ -14,7 +14,7 @@ export const addFavoriteGuide = async (request: Request, response: Response) => 
   });
 
   if (favorite !== null) {
-    response.status(400).send({
+    return response.status(400).send({
       code   : 'already-favorite',
       message: 'Guide is already favorite'
     });

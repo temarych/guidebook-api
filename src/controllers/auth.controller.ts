@@ -6,7 +6,6 @@ import bcrypt                from 'bcrypt';
 import { type User }         from '@prisma/client';
 import { createAccessToken } from '../utils/token';
 import { Profile }           from '../models/profile';
-import { HttpError }         from '../models/error';
 import {
   type ISignInSchema,
   type ISignUpSchema
@@ -21,8 +20,7 @@ export const signUp = async (request: Request, response: Response) => {
   });
 
   if (userWithSuchEmail !== null) {
-    throw new HttpError({
-      status : 400,
+    return response.status(400).send({
       code   : 'email-not-unique',
       message: 'Email is not unique'
     });
@@ -33,8 +31,7 @@ export const signUp = async (request: Request, response: Response) => {
   });
 
   if (userWithSuchUsername !== null) {
-    throw new HttpError({
-      status : 400,
+    return response.status(400).send({
       code   : 'username-not-unique',
       message: 'Username is not unique'
     });
@@ -55,8 +52,7 @@ export const signIn = async (request: Request, response: Response) => {
   });
 
   if (user === null) {
-    throw new HttpError({
-      status : 404,
+    return response.status(404).send({
       code   : 'user-not-found',
       message: `User not found`
     });
@@ -65,8 +61,7 @@ export const signIn = async (request: Request, response: Response) => {
   const isCorrectPassword = await bcrypt.compare(data.password, user.password);
 
   if (!isCorrectPassword) {
-    throw new HttpError({
-      status : 401,
+    return response.status(401).send({
       code   : 'invalid-password',
       message: `Password is not valid`
     });
