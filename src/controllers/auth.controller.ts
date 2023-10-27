@@ -16,9 +16,32 @@ import { prisma }            from '../index';
 export const signUp = async (request: Request, response: Response) => {
   const data = request.body as ISignUpSchema;
 
-  const password = await bcrypt.hash(data.password, 10);
-  const user     = await prisma.user.create({ data: { ...data, password } });
+  const userWithSuchEmail = await prisma.user.findFirst({
+    where: { email: data.email }
+  });
 
+  if (userWithSuchEmail !== null) {
+    throw new HttpError({
+      status : 400,
+      code   : 'email-not-unique',
+      message: 'Email is not unique'
+    });
+  }
+
+  const userWithSuchUsername = await prisma.user.findFirst({
+    where: { email: data.email }
+  });
+
+  if (userWithSuchUsername !== null) {
+    throw new HttpError({
+      status : 400,
+      code   : 'username-not-unique',
+      message: 'Username is not unique'
+    });
+  }
+
+  const password    = await bcrypt.hash(data.password, 10);
+  const user        = await prisma.user.create({ data: { ...data, password } });
   const accessToken = createAccessToken(user.id);
 
   response.send({ accessToken });
