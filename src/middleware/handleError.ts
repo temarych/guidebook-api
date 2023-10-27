@@ -21,7 +21,7 @@ export const handleError = (
   console.error(error);
 
   response.status(500).send({
-    code : 500,
-    error: error.message
+    code : 'internal',
+    error: 'Internal server error'
   });
 };
