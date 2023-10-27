@@ -42,19 +42,19 @@ export const authorize = async (
 
     return next();
   } catch (error) {
-    if (error instanceof JsonWebTokenError) {
-      throw new HttpError({
-        status : 401,
-        code   : 'jwt-invalid',
-        message: 'Access token is not valid'
-      });
-    }
-
     if (error instanceof TokenExpiredError) {
       throw new HttpError({
         status : 401,
         code   : 'jwt-expired',
         message: 'Access token is expired'
+      });
+    }
+
+    if (error instanceof JsonWebTokenError) {
+      throw new HttpError({
+        status : 401,
+        code   : 'jwt-invalid',
+        message: 'Access token is not valid'
       });
     }
 
