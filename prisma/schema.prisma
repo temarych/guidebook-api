@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  username String @unique
-  email    String @unique
-  password String
-  guides   Guide[]
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  username  String     @unique
+  email     String     @unique
+  password  String
+  guides    Guide[]
+  favorites Favorite[]
 }
 
 model Guide {
@@ -23,4 +24,11 @@ model Guide {
   image       String
   author      User   @relation(fields: [authorId], references: [id])
   authorId    String @db.ObjectId
+}
+
+model Favorite {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  guideId String @db.ObjectId
+  userId  String @db.ObjectId
+  user    User   @relation(fields: [userId], references: [id])
 }
