@@ -28,3 +28,14 @@ export const addFavoriteGuide = async (request: Request, response: Response) => 
     message: 'Added guide to favorites'
   });
 };
+
+export const getFavoriteGuides = async (request: Request, response: Response) => {
+  const user = request.user as User;
+
+  const favorites = await prisma.favorite.findMany({
+    where  : { userId: user.id },
+    include: { guide: true }
+  });
+
+  response.send(favorites.map(favorite => favorite.guide));
+};
