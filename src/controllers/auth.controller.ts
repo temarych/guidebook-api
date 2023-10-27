@@ -29,7 +29,7 @@ export const signUp = async (request: Request, response: Response) => {
   }
 
   const userWithSuchUsername = await prisma.user.findFirst({
-    where: { email: data.username }
+    where: { username: data.username }
   });
 
   if (userWithSuchUsername !== null) {
