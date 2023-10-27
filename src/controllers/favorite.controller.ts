@@ -10,7 +10,7 @@ export const addFavoriteGuide = async (request: Request, response: Response) => 
   const { id: guideId } = request.params;
 
   const favorite = await prisma.favorite.findFirst({
-    where: { guideId, id: user.id }
+    where: { guideId, userId: user.id }
   });
 
   if (favorite !== null) {
