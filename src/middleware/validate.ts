@@ -16,7 +16,7 @@ export const validate = <T>(schema: Schema<T>) => (
   next    : NextFunction
 ) => {
   try {
-    schema.parse(request.body);
+    request.body = schema.parse(request.body);
     return next();
   } catch (error) {
     if (error instanceof ZodError) {
