@@ -80,3 +80,15 @@ export const getMe = async (request: Request, response: Response) => {
     email   : user.email
   });
 };
+
+export const deleteMe = async (request: Request, response: Response) => {
+  const user = request.user as User;
+
+  await prisma.user.delete({
+    where: { id: user.id }
+  });
+
+  response.send({
+    message: 'Your account was deleted'
+  });
+};
