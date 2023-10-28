@@ -8,6 +8,6 @@ import {
 
 export const favoriteRoute = Router();
 
-favoriteRoute.put('/:id', authorize, addFavoriteGuide);
-favoriteRoute.delete('/:id', authorize, removeFavoriteGuide);
-favoriteRoute.get('/', authorize, getFavoriteGuides);
+favoriteRoute.put('/guides/:id', authorize, addFavoriteGuide);
+favoriteRoute.delete('/guides/:id', authorize, removeFavoriteGuide);
+favoriteRoute.get('/guides/', authorize, getFavoriteGuides);

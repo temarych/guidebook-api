@@ -57,11 +57,16 @@ export const getFavoriteGuides = async (request: Request, response: Response) =>
   const user = request.user as User;
 
   const favorites = await prisma.favorite.findMany({
-    where  : { userId: user.id },
+    where  : {
+      userId: user.id
+    },
     include: {
       guide: {
-        include: {
-          author: { select: { username: true } }
+        select: {
+          id         : true,
+          title      : true,
+          description: true,
+          emoji      : true
         }
       }
     }

@@ -15,17 +15,16 @@ export const createGuide = async (request: Request, response: Response) => {
 };
 
 export const getGuide = async (request: Request, response: Response) => {
-  const user = request.user as User;
-  const id   = request.params.id;
+  const user    = request.user as User;
+  const guideId = request.params.id;
 
   const guide = await prisma.guide.findFirst({
-    where  : { id },
+    where: {
+      id: guideId
+    },
     include: {
       author: {
         select: { username: true }
-      },
-      favorite: {
-        where: { userId: user.id }
       }
     }
   });
@@ -37,14 +36,14 @@ export const getGuide = async (request: Request, response: Response) => {
     });
   }
 
-  response.send({
-    id         : guide.id,
-    emoji      : guide.emoji,
-    title      : guide.title,
-    description: guide.description,
-    image      : guide.image,
-    authorId   : guide.authorId,
-    author     : guide.author,
-    isFavorite : guide.favorite.length > 0
+  const favorite = await prisma.favorite.findFirst({
+    where : {
+      guideId,
+      userId: user.id
+    }
   });
+
+  const isFavorite = favorite !== null;
+
+  response.send({ ...guide, isFavorite });
 };

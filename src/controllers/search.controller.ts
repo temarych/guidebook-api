@@ -7,6 +7,12 @@ export const searchGuides = async (request: Request, response: Response) => {
   const guides = await prisma.guide.findMany({
     where: {
       title: { contains: query, mode: 'insensitive' }
+    },
+    select: {
+      id         : true,
+      title      : true,
+      description: true,
+      emoji      : true
     }
   });
 
