@@ -29,9 +29,9 @@ export const authorize = async (
     const user = await prisma.user.findFirst({ where: { id } });
 
     if (user === null) {
-      return response.status(404).send({
-        code   : 'user-not-found',
-        message: 'No user found'
+      return response.status(401).send({
+        code   : 'jwt-invalid',
+        message: 'Access token is not valid'
       });
     }
 
