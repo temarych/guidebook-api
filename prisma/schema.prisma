@@ -25,6 +25,17 @@ model Guide {
   author      User       @relation(fields: [authorId], references: [id])
   authorId    String     @db.ObjectId
   favorite    Favorite[]
+  steps       Step[]
+}
+
+model Step {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String 
+  image       String
+  order       Int
+  guideId     String @db.ObjectId
+  guide       Guide  @relation(fields: [guideId], references: [id])
 }
 
 model Favorite {
