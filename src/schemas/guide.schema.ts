@@ -7,4 +7,11 @@ export const createGuideSchema = z.object({
   image      : z.string()
 });
 
+export const createStepSchema = z.object({
+  title      : z.string(),
+  description: z.string(),
+  image      : z.string()
+});
+
 export type ICreateGuideSchema = z.infer<typeof createGuideSchema>;
+export type ICreateStepSchema  = z.infer<typeof createStepSchema>;

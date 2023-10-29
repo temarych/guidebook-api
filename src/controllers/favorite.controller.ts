@@ -6,8 +6,8 @@ import { type User } from '@prisma/client';
 import { prisma }    from '..';
 
 export const addFavoriteGuide = async (request: Request, response: Response) => {
-  const user            = request.user as User;
-  const { id: guideId } = request.params;
+  const user    = request.user as User;
+  const guideId = request.params.guideId;
 
   const favorite = await prisma.favorite.findFirst({
     where: { guideId, userId: user.id }
@@ -30,8 +30,8 @@ export const addFavoriteGuide = async (request: Request, response: Response) => 
 };
 
 export const removeFavoriteGuide = async (request: Request, response: Response) => {
-  const user            = request.user as User;
-  const { id: guideId } = request.params;
+  const user    = request.user as User;
+  const guideId = request.params.guideId;
 
   const favorite = await prisma.favorite.findFirst({
     where: { guideId, userId: user.id }
