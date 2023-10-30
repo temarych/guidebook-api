@@ -1,20 +1,23 @@
 import { type Request, type Response } from 'express';
-import { prisma }                      from '../index';
+import { type User }                   from '@prisma/client';
+import { guideService }                from '../services/guide.service';
+import { GuidePreviewDTO }             from '../dtos/guide.dto';
 
-export const searchGuides = async (request: Request, response: Response) => {
-  const query = request.query.query as string;
+class SearchController {
+  public async searchGuides (request: Request, response: Response) {
+    const query  = request.query.query as string;
+    const guides = await guideService.searchGuides(query);
 
-  const guides = await prisma.guide.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' }
-    },
-    select: {
-      id         : true,
-      title      : true,
-      description: true,
-      emoji      : true
-    }
-  });
+    response.send(guides.map(guide => new GuidePreviewDTO(guide)));
+  }
 
-  response.send(guides);
-};
+  public async searchFavoriteGuides (request: Request, response: Response) {
+    const user           = request.user as User;
+    const query          = request.query.query as string;
+    const favoriteGuides = await guideService.searchFavoriteGuides(query, user.id);
+
+    response.send(favoriteGuides.map(guide => new GuidePreviewDTO(guide)));
+  }
+}
+
+export const searchController = new SearchController();

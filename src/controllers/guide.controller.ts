@@ -4,102 +4,81 @@ import {
   type ICreateStepSchema,
   type ICreateGuideSchema
 }                                      from '../schemas/guide.schema';
-import { prisma }                      from '../index';
+import { GuideDTO }                    from '../dtos/guide.dto';
+import { guideService }                from '../services/guide.service';
+import { favoriteService }             from '../services/favorite.service';
+import { userService }                 from '../services/user.service';
+import { stepService }                 from '../services/step.service';
 
-export const createGuide = async (request: Request, response: Response) => {
-  const user = request.user as User;
-  const data = request.body as ICreateGuideSchema;
+class GuideController {
+  public async createGuide (request: Request, response: Response) {
+    const user  = request.user as User;
+    const data  = request.body as ICreateGuideSchema;
+    const guide = await guideService.createGuide({ ...data, authorId: user.id });
 
-  const guide = await prisma.guide.create({
-    data: { ...data, authorId: user.id }
-  });
-
-  response.send(guide);
-};
-
-export const getGuide = async (request: Request, response: Response) => {
-  const user    = request.user as User;
-  const guideId = request.params.guideId;
-
-  const guide = await prisma.guide.findFirst({
-    where: {
-      id: guideId
-    },
-    include: {
-      author: {
-        select: { username: true }
-      }
-    }
-  });
-
-  if (guide === null) {
-    return response.status(404).send({
-      code   : 'guide-not-found',
-      message: 'Guide not found'
-    });
+    response.send(guide);
   }
 
-  const favorite = await prisma.favorite.findFirst({
-    where : {
-      guideId,
-      userId: user.id
+  public async getGuide (request: Request, response: Response) {
+    const user    = request.user as User;
+    const guideId = request.params.guideId;
+    const guide   = await guideService.findGuideById(guideId);
+
+    if (guide === null) {
+      return response.status(404).send({
+        code   : 'guide-not-found',
+        message: 'Guide not found'
+      });
     }
-  });
 
-  const isFavorite = favorite !== null;
+    const author = await userService.findUserById(guide.authorId);
 
-  response.send({ ...guide, isFavorite });
-};
+    if (author === null) {
+      return response.status(404).send({
+        code   : 'author-not-found',
+        message: 'Author not found'
+      });
+    }
 
-export const getSteps = async (request: Request, response: Response) => {
-  const guideId = request.params.guideId;
+    const favoriteGuide = await favoriteService.findFavoriteGuide(guideId, user.id);
+    const isFavorite    = favoriteGuide !== null;
+    const guideDTO      = new GuideDTO({ ...guide, author, isFavorite });
 
-  const guide = await prisma.guide.findFirst({
-    where: { id: guideId }
-  });
-
-  if (guide === null) {
-    return response.status(404).send({
-      code   : 'guide-not-found',
-      message: 'Guide not found'
-    });
+    response.send(guideDTO);
   }
 
-  const steps = await prisma.step.findMany({
-    where  : { guideId },
-    orderBy: { order: 'asc' }
-  });
+  public async getSteps (request: Request, response: Response) {
+    const guideId = request.params.guideId;
+    const guide   = await guideService.findGuideById(guideId);
 
-  response.send(steps);
-};
+    if (guide === null) {
+      return response.status(404).send({
+        code   : 'guide-not-found',
+        message: 'Guide not found'
+      });
+    }
 
-export const addStep = async (request: Request, response: Response) => {
-  const data    = request.body as ICreateStepSchema;
-  const guideId = request.params.guideId;
+    const steps = await stepService.findSteps(guideId);
 
-  const guide = await prisma.guide.findFirst({
-    where: { id: guideId }
-  });
-
-  if (guide === null) {
-    return response.status(404).send({
-      code   : 'guide-not-found',
-      message: 'Guide not found'
-    });
+    response.send(steps);
   }
 
-  const { _max: { order } } = await prisma.step.aggregate({
-    where: { guideId },
-    _max : { order: true }
-  });
+  public async addStep (request: Request, response: Response) {
+    const data    = request.body as ICreateStepSchema;
+    const guideId = request.params.guideId;
+    const guide   = await guideService.findGuideById(guideId);
 
-  const step = await prisma.step.create({
-    data: {
-      ...data,
-      guideId,
-      order: order !== null ? order + 1 : 1
+    if (guide === null) {
+      return response.status(404).send({
+        code   : 'guide-not-found',
+        message: 'Guide not found'
+      });
     }
-  });
 
-  response.send(step);
-};
+    const step = await stepService.addStep({ ...data, guideId });
+
+    response.send(step);
+  }
+}
+
+export const guideController = new GuideController();

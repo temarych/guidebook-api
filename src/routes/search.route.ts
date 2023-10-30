@@ -1,7 +1,8 @@
-import { Router }       from 'express';
-import { searchGuides } from '../controllers/search.controller';
-import { authorize }    from '../middleware/authorize';
+import { Router }           from 'express';
+import { authorize }        from '../middleware/authorize';
+import { searchController } from '../controllers/search.controller';
 
 export const searchRoute = Router();
 
-searchRoute.get('/guides', authorize, searchGuides);
+searchRoute.get('/guides', authorize, searchController.searchGuides);
+searchRoute.get('/favorite/guides', authorize, searchController.searchFavoriteGuides);
