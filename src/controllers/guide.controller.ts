@@ -40,8 +40,9 @@ class GuideController {
       });
     }
 
-    const isFavorite = await favoriteService.checkIsGuideFavorite(guideId, user.id);
-    const guideDTO   = new GuideDTO({ ...guide, author, isFavorite });
+    const favoriteGuide = await favoriteService.findFavoriteGuide(guideId, user.id);
+    const isFavorite    = favoriteGuide !== null;
+    const guideDTO      = new GuideDTO({ ...guide, author, isFavorite });
 
     response.send(guideDTO);
   }

@@ -22,6 +22,21 @@ class GuideService {
       }
     });
   }
+
+  public async searchFavoriteGuides (query: string, userId: string) {
+    const favoriteGuides = await prisma.guide.findMany({
+      where : {
+        title: {
+          contains: query,
+          mode    : 'insensitive'
+        },
+        favorite: {
+          some: { userId }
+        }
+      }
+    });
+    return favoriteGuides.map(guide => guide);
+  }
 }
 
 export const guideService = new GuideService();

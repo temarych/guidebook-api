@@ -6,4 +6,3 @@ export const favoriteRoute = Router();
 
 favoriteRoute.put('/guides/:guideId', authorize, favoriteController.addFavoriteGuide);
 favoriteRoute.delete('/guides/:guideId', authorize, favoriteController.removeFavoriteGuide);
-favoriteRoute.get('/guides', authorize, favoriteController.getFavoriteGuides);
