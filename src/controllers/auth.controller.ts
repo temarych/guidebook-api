@@ -1,94 +1,78 @@
-import {
-  type Request,
-  type Response
-}                            from 'express';
-import bcrypt                from 'bcrypt';
-import { type User }         from '@prisma/client';
-import { createAccessToken } from '../utils/token';
-import {
-  type ISignInSchema,
-  type ISignUpSchema
-}                            from '../schemas/auth.schema';
-import { prisma }            from '../index';
+import { type Request, type Response }            from 'express';
+import bcrypt                                     from 'bcrypt';
+import { type User }                              from '@prisma/client';
+import { createAccessToken }                      from '../utils/token';
+import { type ISignInSchema, type ISignUpSchema } from '../schemas/auth.schema';
+import { ProfileDTO }                             from '../dtos/user.dto';
+import { userService }                            from '../services/user.service';
 
-export const signUp = async (request: Request, response: Response) => {
-  const data = request.body as ISignUpSchema;
+class AuthController {
+  public async signUp (request: Request, response: Response) {
+    const data              = request.body as ISignUpSchema;
+    const userWithSuchEmail = await userService.findUserByEmail(data.email);
 
-  const userWithSuchEmail = await prisma.user.findFirst({
-    where: { email: data.email }
-  });
+    if (userWithSuchEmail !== null) {
+      return response.status(400).send({
+        code   : 'email-not-unique',
+        message: 'Email is not unique'
+      });
+    }
 
-  if (userWithSuchEmail !== null) {
-    return response.status(400).send({
-      code   : 'email-not-unique',
-      message: 'Email is not unique'
-    });
+    const userWithSuchUsername = await userService.findUserByUsername(data.username);
+
+    if (userWithSuchUsername !== null) {
+      return response.status(400).send({
+        code   : 'username-not-unique',
+        message: 'Username is not unique'
+      });
+    }
+
+    const password    = await bcrypt.hash(data.password, 10);
+    const user        = await userService.createUser({ ...data, password });
+    const accessToken = createAccessToken(user.id);
+
+    response.send({ accessToken });
   }
 
-  const userWithSuchUsername = await prisma.user.findFirst({
-    where: { username: data.username }
-  });
+  public async signIn (request: Request, response: Response) {
+    const data = request.body as ISignInSchema;
+    const user = await userService.findUserByEmail(data.email);
 
-  if (userWithSuchUsername !== null) {
-    return response.status(400).send({
-      code   : 'username-not-unique',
-      message: 'Username is not unique'
-    });
+    if (user === null) {
+      return response.status(404).send({
+        code   : 'user-not-found',
+        message: `User not found`
+      });
+    }
+
+    const isCorrectPassword = await bcrypt.compare(data.password, user.password);
+
+    if (!isCorrectPassword) {
+      return response.status(401).send({
+        code   : 'invalid-password',
+        message: `Password is not valid`
+      });
+    }
+
+    const accessToken = createAccessToken(user.id);
+
+    response.send({ accessToken });
   }
 
-  const password    = await bcrypt.hash(data.password, 10);
-  const user        = await prisma.user.create({ data: { ...data, password } });
-  const accessToken = createAccessToken(user.id);
+  public async getMe (request: Request, response: Response) {
+    const user       = request.user as User;
+    const profileDTO = new ProfileDTO(user);
 
-  response.send({ accessToken });
-};
-
-export const signIn = async (request: Request, response: Response) => {
-  const data = request.body as ISignInSchema;
-
-  const user = await prisma.user.findFirst({
-    where: { email: data.email }
-  });
-
-  if (user === null) {
-    return response.status(404).send({
-      code   : 'user-not-found',
-      message: `User not found`
-    });
+    response.send({ ...profileDTO });
   }
 
-  const isCorrectPassword = await bcrypt.compare(data.password, user.password);
+  public async deleteMe (request: Request, response: Response) {
+    const user = request.user as User;
 
-  if (!isCorrectPassword) {
-    return response.status(401).send({
-      code   : 'invalid-password',
-      message: `Password is not valid`
-    });
+    await userService.deleteUser(user.id);
+
+    response.send({ message: 'Your account was deleted' });
   }
+}
 
-  const accessToken = createAccessToken(user.id);
-
-  response.send({ accessToken });
-};
-
-export const getMe = async (request: Request, response: Response) => {
-  const user = request.user as User;
-
-  response.send({
-    id      : user.id,
-    username: user.username,
-    email   : user.email
-  });
-};
-
-export const deleteMe = async (request: Request, response: Response) => {
-  const user = request.user as User;
-
-  await prisma.user.delete({
-    where: { id: user.id }
-  });
-
-  response.send({
-    message: 'Your account was deleted'
-  });
-};
+export const authController = new AuthController();
