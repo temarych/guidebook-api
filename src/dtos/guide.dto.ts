@@ -37,7 +37,7 @@ export class GuideDTO implements IGuideDTO {
     this.description = data.description;
     this.emoji       = data.emoji;
     this.image       = data.image;
-    this.author      = data.author;
+    this.author      = { username: data.author.username };
     this.authorId    = data.authorId;
     this.isFavorite  = data.isFavorite;
   }
