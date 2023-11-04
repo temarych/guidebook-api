@@ -1,9 +1,7 @@
 import { type Request, type Response }            from 'express';
 import bcrypt                                     from 'bcrypt';
-import { type User }                              from '@prisma/client';
 import { createAccessToken }                      from '../utils/token';
 import { type ISignInSchema, type ISignUpSchema } from '../schemas/auth.schema';
-import { ProfileDTO }                             from '../dtos/user.dto';
 import { userService }                            from '../services/user.service';
 
 class AuthController {
@@ -57,21 +55,6 @@ class AuthController {
     const accessToken = createAccessToken(user.id);
 
     response.send({ accessToken });
-  }
-
-  public async getMe (request: Request, response: Response) {
-    const user       = request.user as User;
-    const profileDTO = new ProfileDTO(user);
-
-    response.send({ ...profileDTO });
-  }
-
-  public async deleteMe (request: Request, response: Response) {
-    const user = request.user as User;
-
-    await userService.deleteUser(user.id);
-
-    response.send({ message: 'Your account was deleted' });
   }
 }
 
