@@ -6,10 +6,10 @@ import dotenv            from 'dotenv';
 import bodyParser        from 'body-parser';
 import { PrismaClient }  from '@prisma/client';
 import { handleError }   from './middleware/handleError';
-import { searchRoute }   from './routes/search.route';
 import { guideRoute }    from './routes/guide.route';
 import { authRoute }     from './routes/auth.route';
 import { favoriteRoute } from './routes/favorite.route';
+import { selfRoute }     from './routes/self.route';
 
 dotenv.config();
 
@@ -20,10 +20,10 @@ export const prisma = new PrismaClient();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/search', searchRoute);
-app.use('/guide', guideRoute);
+app.use('/guides', guideRoute);
 app.use('/favorite', favoriteRoute);
 app.use('/auth', authRoute);
+app.use('/self', selfRoute);
 
 app.use(handleError);
 

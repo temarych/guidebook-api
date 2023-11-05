@@ -12,6 +12,18 @@ class GuideService {
     });
   }
 
+  public async searchGuidesByAuthor (query: string, authorId: string) {
+    return await prisma.guide.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode    : 'insensitive'
+        },
+        authorId
+      }
+    });
+  }
+
   public async searchGuides (query: string) {
     return await prisma.guide.findMany({
       where: {

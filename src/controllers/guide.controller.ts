@@ -4,7 +4,7 @@ import {
   type ICreateStepSchema,
   type ICreateGuideSchema
 }                                      from '../schemas/guide.schema';
-import { GuideDTO }                    from '../dtos/guide.dto';
+import { GuideDTO, GuidePreviewDTO }   from '../dtos/guide.dto';
 import { guideService }                from '../services/guide.service';
 import { favoriteService }             from '../services/favorite.service';
 import { userService }                 from '../services/user.service';
@@ -45,6 +45,13 @@ class GuideController {
     const guideDTO      = new GuideDTO({ ...guide, author, isFavorite });
 
     response.send(guideDTO);
+  }
+
+  public async getGuides (request: Request, response: Response) {
+    const query  = request.query.query as string;
+    const guides = await guideService.searchGuides(query);
+
+    response.send(guides.map(guide => new GuidePreviewDTO(guide)));
   }
 
   public async getSteps (request: Request, response: Response) {
