@@ -2,13 +2,16 @@ import { type Request, type Response } from 'express';
 import { type User }                   from '@prisma/client';
 import { userService }                 from '../services/user.service';
 import { guideService }                from '../services/guide.service';
+import { favoriteService }             from '../services/favorite.service';
 import { ProfileDTO }                  from '../dtos/user.dto';
 import { GuidePreviewDTO }             from '../dtos/guide.dto';
 
 class SelfController {
   public async getSelf (request: Request, response: Response) {
-    const user       = request.user as User;
-    const profileDTO = new ProfileDTO(user);
+    const user        = request.user as User;
+    const guidesCount = await guideService.countGuides(user.id);
+    const likesCount  = await favoriteService.countUserLikes(user.id);
+    const profileDTO  = new ProfileDTO({ ...user, likesCount, guidesCount });
 
     response.send({ ...profileDTO });
   }

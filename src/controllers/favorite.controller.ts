@@ -1,7 +1,6 @@
 import { type Request, type Response } from 'express';
 import { type User }                   from '@prisma/client';
 import { favoriteService }             from '../services/favorite.service';
-import { guideService }                from '../services/guide.service';
 import { GuidePreviewDTO }             from '../dtos/guide.dto';
 
 class FavoriteController {
@@ -42,7 +41,7 @@ class FavoriteController {
   public async getFavoriteGuides (request: Request, response: Response) {
     const user           = request.user as User;
     const query          = request.query.query as string;
-    const favoriteGuides = await guideService.searchFavoriteGuides(query, user.id);
+    const favoriteGuides = await favoriteService.searchFavoriteGuides(query, user.id);
 
     response.send(favoriteGuides.map(guide => new GuidePreviewDTO(guide)));
   }

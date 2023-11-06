@@ -14,7 +14,12 @@ class GuideController {
   public async createGuide (request: Request, response: Response) {
     const user  = request.user as User;
     const data  = request.body as ICreateGuideSchema;
-    const guide = await guideService.createGuide({ ...data, authorId: user.id });
+
+    const guide = await guideService.createGuide({
+      ...data,
+      authorId : user.id,
+      createdAt: new Date()
+    });
 
     response.send(guide);
   }
@@ -40,9 +45,10 @@ class GuideController {
       });
     }
 
+    const likesCount    = await favoriteService.countGuideLikes(guideId);
     const favoriteGuide = await favoriteService.findFavoriteGuide(guideId, user.id);
     const isFavorite    = favoriteGuide !== null;
-    const guideDTO      = new GuideDTO({ ...guide, author, isFavorite });
+    const guideDTO      = new GuideDTO({ ...guide, author, isFavorite, likesCount });
 
     response.send(guideDTO);
   }

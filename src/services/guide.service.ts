@@ -12,6 +12,12 @@ class GuideService {
     });
   }
 
+  public async countGuides (authorId: string) {
+    return await prisma.guide.count({
+      where: { authorId }
+    });
+  }
+
   public async searchGuidesByAuthor (query: string, authorId: string) {
     return await prisma.guide.findMany({
       where: {
@@ -33,21 +39,6 @@ class GuideService {
         }
       }
     });
-  }
-
-  public async searchFavoriteGuides (query: string, userId: string) {
-    const favoriteGuides = await prisma.guide.findMany({
-      where : {
-        title: {
-          contains: query,
-          mode    : 'insensitive'
-        },
-        favorite: {
-          some: { userId }
-        }
-      }
-    });
-    return favoriteGuides.map(guide => guide);
   }
 }
 

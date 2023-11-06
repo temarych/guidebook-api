@@ -18,6 +18,35 @@ class FavoriteService {
       where: { id: favoriteId }
     });
   }
+
+  public async countGuideLikes (guideId: string) {
+    return await prisma.favorite.count({
+      where: { guideId }
+    });
+  }
+
+  public async countUserLikes (userId: string) {
+    return await prisma.favorite.count({
+      where: {
+        guide: { authorId: userId }
+      }
+    });
+  }
+
+  public async searchFavoriteGuides (query: string, userId: string) {
+    const favoriteGuides = await prisma.guide.findMany({
+      where : {
+        title: {
+          contains: query,
+          mode    : 'insensitive'
+        },
+        favorite: {
+          some: { userId }
+        }
+      }
+    });
+    return favoriteGuides.map(guide => guide);
+  }
 }
 
 export const favoriteService = new FavoriteService();
